@@ -1,0 +1,43 @@
+name: fdsmp_home
+version: 1.0
+main: org.mazegroup.Main
+api-version: '1.16'
+description: A home plugin of FreedomSMP
+load: STARTUP
+commands:
+  sethome:
+    description: Create a home
+    aliases:
+      - sh
+  home:
+    description: Teleport on your home
+    aliases:
+      - h
+  delhome:
+    description: Delete your home
+    aliases:
+      - dh
+  homelist:
+    description: Home list
+    aliases:
+      - hl
+  homecoords:
+    description: View home coordinates
+    aliases:
+      - hc
+  setdefaulthome:
+    description: Set the default home
+    aliases:
+      - sdh
+  renamehome:
+    description: Rename a home
+    aliases:
+      - rh
+  admin.homeconfigs.teleport_time:
+    description: Set teleport time
+    permission: home.setteleporttime
+    permission-message: "§cYou don't have permission to set the teleport time."
+permissions:
+  home.setteleporttime:
+    description: Allows setting the teleport time.
+    default: op
