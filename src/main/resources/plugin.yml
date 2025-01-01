@@ -1,5 +1,5 @@
-name: fdsmp_home
-version: 1.0
+name: MultiHome
+version: 1.1
 main: org.mazegroup.Main
 api-version: '1.16'
 description: A home plugin of FreedomSMP

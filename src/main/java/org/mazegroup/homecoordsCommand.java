@@ -6,8 +6,11 @@ import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.io.File;
 
 public class homecoordsCommand implements CommandExecutor {
     @Override
@@ -19,28 +22,28 @@ public class homecoordsCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        FileConfiguration config = Main.getInstance().getConfig();
+        FileConfiguration homesFile = fileConfig("homes.yml");
         String playerUUID = player.getUniqueId().toString();
         String basePath = "players." + playerUUID + ".homes";
         
-        Main.register_user_if_not(config, playerUUID);
+        Main.register_user_if_not(homesFile, playerUUID);
 
         // Default home coordinates
         if (args.length == 0) {
             String defaultHome = null;
 
-            for (String home : config.getConfigurationSection(basePath).getKeys(false)) {
-                if (config.getBoolean(basePath + "." + home + ".default", false)) {
+            for (String home : homesFile.getConfigurationSection(basePath).getKeys(false)) {
+                if (homesFile.getBoolean(basePath + "." + home + ".default", false)) {
                     defaultHome = home;
                     break;
                 }
             }
 
             if (defaultHome != null) {
-                World world = Bukkit.getServer().getWorld(config.getString(basePath + "." + defaultHome + ".world"));
-                double x = config.getDouble(basePath + "." + defaultHome + ".x");
-                double y = config.getDouble(basePath + "." + defaultHome + ".y");
-                double z = config.getDouble(basePath + "." + defaultHome + ".z");
+                World world = Bukkit.getServer().getWorld(homesFile.getString(basePath + "." + defaultHome + ".world"));
+                double x = homesFile.getDouble(basePath + "." + defaultHome + ".x");
+                double y = homesFile.getDouble(basePath + "." + defaultHome + ".y");
+                double z = homesFile.getDouble(basePath + "." + defaultHome + ".z");
 
                 String worldName = getWorldName(world);
 
@@ -53,11 +56,11 @@ public class homecoordsCommand implements CommandExecutor {
         else {
             String homeName = args[0];
 
-            if (config.contains(basePath + "." + homeName)) {
-                World world = Bukkit.getServer().getWorld(config.getString(basePath + "." + homeName + ".world"));
-                double x = config.getDouble(basePath + "." + homeName + ".x");
-                double y = config.getDouble(basePath + "." + homeName + ".y");
-                double z = config.getDouble(basePath + "." + homeName + ".z");
+            if (homesFile.contains(basePath + "." + homeName)) {
+                World world = Bukkit.getServer().getWorld(homesFile.getString(basePath + "." + homeName + ".world"));
+                double x = homesFile.getDouble(basePath + "." + homeName + ".x");
+                double y = homesFile.getDouble(basePath + "." + homeName + ".y");
+                double z = homesFile.getDouble(basePath + "." + homeName + ".z");
 
                 String worldName = getWorldName(world);
 
@@ -85,6 +88,28 @@ public class homecoordsCommand implements CommandExecutor {
                 return "The End";
             default:
                 return "Personalized environnement";
+        }
+    }
+
+    public FileConfiguration fileConfig(String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    private void saveFileConfig(FileConfiguration config, String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        try {
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

@@ -1,11 +1,1 @@
-org\mazegroup\homeCommand.class
-org\mazegroup\homecoordsCommand.class
-org\mazegroup\homeCommand$1.class
-org\mazegroup\sethomeCommand.class
-org\mazegroup\homecoordsCommand$1.class
-org\mazegroup\delhomeCommand.class
-org\mazegroup\setTelportTimeCommand.class
-org\mazegroup\homelistCommand.class
-org\mazegroup\renamehomeCommand.class
-org\mazegroup\setdefaulthomeCommand.class
-org\mazegroup\Main.class
+org/mazegroup/fileConfig.class
