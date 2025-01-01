@@ -1,2 +1,2 @@
-# fd_multihome
+# Freedom MultiHome
 Freedom Multi Home Spigot Plugin
