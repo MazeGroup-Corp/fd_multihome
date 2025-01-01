@@ -1,5 +1,6 @@
 package org.mazegroup;
 
+import java.io.File;
 import java.util.Set;
 
 import org.bukkit.command.Command;
@@ -18,52 +19,75 @@ class delhomeCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        FileConfiguration config = Main.getInstance().getConfig();
+        FileConfiguration homes = fileConfig("homes.yml");
         String playerUUID = player.getUniqueId().toString();
         String basePath = "players." + playerUUID + ".homes";
-        
-        Main.register_user_if_not(config, playerUUID);
+
+        Main.register_user_if_not(homes, playerUUID);
 
         if (args.length == 0) {
             String defaultHome = null;
 
-            for (String home : config.getConfigurationSection(basePath).getKeys(false)) {
-                if (config.getBoolean(basePath + "." + home + ".default", false)) {
+            for (String home : homes.getConfigurationSection(basePath).getKeys(false)) {
+                if (homes.getBoolean(basePath + "." + home + ".default", false)) {
                     defaultHome = home;
                     break;
                 }
             }
 
             if (defaultHome != null) {
-                config.set(basePath + "." + defaultHome, null);
-                Main.getInstance().saveConfig();
+                homes.set(basePath + "." + defaultHome, null);
+                saveFileConfig(homes, "homes.yml");
                 player.sendMessage("§aYour default home '" + defaultHome + "' has been deleted.");
             } else {
-                player.sendMessage("§cYou don't have a default home");
+                player.sendMessage("§cYou don't have a default home.");
             }
         } else {
             String homeName = args[0];
 
-            if (config.contains(basePath + "." + homeName)) {
-                boolean wasDefault = config.getBoolean(basePath + "." + homeName + ".default", false);
+            if (homes.contains(basePath + "." + homeName)) {
+                boolean wasDefault = homes.getBoolean(basePath + "." + homeName + ".default", false);
 
-                config.set(basePath + "." + homeName, null);
-                Main.getInstance().saveConfig();
+                homes.set(basePath + "." + homeName, null);
+                saveFileConfig(homes, "homes.yml");
                 player.sendMessage("§aThe home '" + homeName + "' has been deleted.");
 
                 if (wasDefault) {
-                    Set<String> remainingHomes = config.getConfigurationSection(basePath).getKeys(false);
+                    Set<String> remainingHomes = homes.getConfigurationSection(basePath).getKeys(false);
                     if (!remainingHomes.isEmpty()) {
                         String newDefaultHome = remainingHomes.iterator().next();
-                        config.set(basePath + "." + newDefaultHome + ".default", true);
-                        player.sendMessage("§aThe home '" + newDefaultHome + "' has been defined like your default home");
+                        homes.set(basePath + "." + newDefaultHome + ".default", true);
+                        saveFileConfig(homes, "homes.yml");
+                        player.sendMessage("§aThe home '" + newDefaultHome + "' has been defined as your default home.");
                     }
                 }
             } else {
-                player.sendMessage("§cYou don't have a home nammed '" + homeName + "'.");
+                player.sendMessage("§cYou don't have a home named '" + homeName + "'.");
             }
         }
 
         return true;
+    }
+
+    private FileConfiguration fileConfig(String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(file);
+    }
+
+    private void saveFileConfig(FileConfiguration config, String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        try {
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

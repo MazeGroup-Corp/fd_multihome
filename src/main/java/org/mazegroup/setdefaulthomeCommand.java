@@ -1,10 +1,12 @@
 package org.mazegroup;
 
+import java.io.File;
 import java.util.Set;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,18 +20,18 @@ public class setdefaulthomeCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        FileConfiguration config = Main.getInstance().getConfig();
+        FileConfiguration homesFile = fileConfig("homes.yml");
         String playerUUID = player.getUniqueId().toString();
         String basePath = "players." + playerUUID + ".homes";
 
-        Main.register_user_if_not(config, playerUUID);
+        Main.register_user_if_not(homesFile, playerUUID);
 
         if (args.length == 0) {
             player.sendMessage("§cYou must enter the name of the home you want to set as default after the command.");
             return false;
         } else {
             String homeName = args[0];
-            ConfigurationSection homesSection = config.getConfigurationSection(basePath);
+            ConfigurationSection homesSection = homesFile.getConfigurationSection(basePath);
 
             if (homesSection == null || !homesSection.contains(homeName)) {
                 player.sendMessage("§cYou don't have a home named '" + homeName + "'.");
@@ -58,5 +60,27 @@ public class setdefaulthomeCommand implements CommandExecutor {
 
         Main.getInstance().saveConfig();
         return true;
+    }
+
+    public FileConfiguration fileConfig(String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    private void saveFileConfig(FileConfiguration config, String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        try {
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

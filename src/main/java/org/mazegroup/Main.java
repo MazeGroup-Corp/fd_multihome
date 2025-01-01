@@ -1,11 +1,13 @@
 package org.mazegroup;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 // import org.bukkit.command.Command;
 // import org.bukkit.command.CommandSender;
 // import org.bukkit.entity.Player;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.configuration.ConfigurationSection;
@@ -76,5 +78,27 @@ public final class Main extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
         getLogger().info("Disabled.");
+    }
+
+    public FileConfiguration fileConfig(String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return YamlConfiguration.loadConfiguration(file);
+    }
+
+    private void saveFileConfig(FileConfiguration config, String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        try {
+            config.save(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

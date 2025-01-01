@@ -10,9 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+
+import java.io.File;
 
 public class homeCommand implements CommandExecutor, Listener {
-
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 
@@ -22,21 +24,22 @@ public class homeCommand implements CommandExecutor, Listener {
         }
 
         Player player = (Player) sender;
+        FileConfiguration homes = fileConfig("homes.yml");
         FileConfiguration config = Main.getInstance().getConfig();
         String playerUUID = player.getUniqueId().toString();
         String basePath = "players." + playerUUID + ".homes";
 
-        Main.register_user_if_not(config, playerUUID);
+        Main.register_user_if_not(homes, playerUUID);
 
-        double teleportTime = config.getDouble("config.teleport-time", 5.0); // Default to 5 seconds if not set
+        double teleportTime = config.getDouble("config.teleport-time"); // Default to 5 seconds if not set
 
-        String homeName = args.length == 0 ? getDefaultHome(config, basePath) : args[0];
-        if (homeName == null || !config.contains(basePath + "." + homeName)) {
+        String homeName = args.length == 0 ? getDefaultHome(homes, basePath) : args[0];
+        if (homeName == null || !homes.contains(basePath + "." + homeName)) {
             player.sendMessage("§cYou don't have a home '" + (homeName == null ? "default" : homeName) + "'.");
             return true;
         }
 
-        Location targetLocation = getHomeLocation(config, basePath, homeName);
+        Location targetLocation = getHomeLocation(homes, basePath, homeName);
         if (targetLocation == null) {
             player.sendMessage("§cError: Invalid home location.");
             return true;
@@ -44,7 +47,7 @@ public class homeCommand implements CommandExecutor, Listener {
 
         player.sendMessage("§eTeleporting to your home '" + homeName + "' in " + teleportTime + " seconds. Don't move!");
 
-        Location initialLocation = player.getLocation(); // Position initiale au moment de la commande
+        Location initialLocation = player.getLocation();
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -55,15 +58,17 @@ public class homeCommand implements CommandExecutor, Listener {
                 player.teleport(targetLocation);
                 player.sendMessage("§aYou have been teleported to your home '" + homeName + "'.");
             }
-        }.runTaskLater(Main.getInstance(), (long) (teleportTime * 20)); // Delayed by teleportTime in seconds
+        }.runTaskLater(Main.getInstance(), (long) (teleportTime * 20));
 
         return true;
     }
 
     private String getDefaultHome(FileConfiguration config, String basePath) {
-        for (String home : config.getConfigurationSection(basePath).getKeys(false)) {
-            if (config.getBoolean(basePath + "." + home + ".default", false)) {
-                return home;
+        if (config.getConfigurationSection(basePath) != null) {
+            for (String home : config.getConfigurationSection(basePath).getKeys(false)) {
+                if (config.getBoolean(basePath + "." + home + ".default", false)) {
+                    return home;
+                }
             }
         }
         return null;
@@ -85,7 +90,21 @@ public class homeCommand implements CommandExecutor, Listener {
         double deltaY = Math.abs(from.getY() - to.getY());
         double deltaZ = Math.abs(from.getZ() - to.getZ());
 
-        // Seuil de détection de mouvement significatif
         return deltaX > 0.1 || deltaY > 0.1 || deltaZ > 0.1;
+    }
+
+    //
+
+    public FileConfiguration fileConfig(String fileName) {
+        File file = new File(Main.getInstance().getDataFolder(), fileName);
+        if (!file.exists()) {
+            try {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return YamlConfiguration.loadConfiguration(file);
     }
 }
