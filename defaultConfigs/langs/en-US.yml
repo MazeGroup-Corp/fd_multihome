@@ -7,7 +7,7 @@ global:
 
 homeCommandMessage:
   # Error message
-  dont_have_a_home: "§cYou don't have a home."
+  dont_have_a_home: "§cYou don't have a home '{homeName}'."
   invalid_location: "§cError: Invalid home location."
   # Teleporting message
   teleporting: "§eTeleporting to your home {homeName} in {teleportTime} seconds."
