@@ -3,7 +3,7 @@
 global:
   load_message: "MultiHome has been loaded !"
   unload_message: "MultiHome has been unloaded !"
-    not_a_player: "This command must be executed by a player."
+  not_a_player: "This command must be executed by a player."
 
 homeCommandMessage:
   # Error message
