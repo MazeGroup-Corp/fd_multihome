@@ -1,8 +1,12 @@
 # English US Language
 
+global:
+  load_message: "MultiHome has been loaded !"
+  unload_message: "MultiHome has been unloaded !"
+  not_a_player: "This command must be executed by a player."
+
 homeCommandMessage:
   # Error message
-  not_a_player: "This command must be executed by a player."
   dont_have_a_home: "§cYou don't have a home {homeName}."
   invalid_location: "§cError: Invalid home location."
   # Teleporting message
