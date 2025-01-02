@@ -3,4 +3,4 @@ config:
   # Set telport time
   teleport-time: 5.0 
   # Set chat message language
-  language: en-EN    
+  language: en-US
