@@ -3,7 +3,7 @@
 homeCommandMessage:
   # Error message
   not_a_player: "This command must be executed by a player."
-  dont_have_a_home: "§cYou don't have a home {homeName}."
+  dont_have_a_home: "§cYou don't have a home {}."
   invalid_location: "§cError: Invalid home location."
   # Teleporting message
   teleporting: "§eTeleporting to your home {homeName} in {teleportTime} seconds. Don't move!"
